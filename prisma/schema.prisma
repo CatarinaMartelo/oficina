@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  email     String   @unique @db.VarChar(255)
+  password  String   @db.VarChar(255)
+  deleted   Boolean  @default(false)
+}
+
+model Automovel {
+  id          String    @id @default(uuid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  matricula   String    @db.VarChar(255)
+  marca       String    @db.VarChar(255)
+  modelo      String    @db.VarChar(255)
+  cor         String    @db.VarChar(255)
+  observacoes String?   @db.Text
+  deleted     Boolean   @default(false)
+  Factura     Factura[]
+}
+
+model Factura {
+  id               String           @id @default(uuid())
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  numero_ft        String           @unique
+  preco_total      Int
+  metodo_pagamento String
+  vat_number       String?
+  automovelId      String
+  deleted          Boolean          @default(false)
+  automovel        Automovel        @relation(fields: [automovelId], references: [id])
+  items            Item_Reparacao[]
+}
+
+model Item_Reparacao {
+  id       String    @id @default(uuid())
+  nome     String    @unique @db.VarChar(255)
+  preco    Int
+  deleted  Boolean   @default(false)
+  facturas Factura[]
+}
